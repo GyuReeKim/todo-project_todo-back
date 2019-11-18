@@ -148,3 +148,5 @@ JWT_AUTH = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True # 배포단계에서는 자신의 domain만 열어줘야한다.
+
+AUTH_USER_MODEL = 'todos.User'
