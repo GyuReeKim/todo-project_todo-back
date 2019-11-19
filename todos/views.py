@@ -1,11 +1,11 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .serializers import TodoSerializer
+from .serializers import TodoSerializer, UserSerializer
 # api_view는 api view 페이지를 만들어준다.
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from .models import Todo
+from .models import Todo, User
 
 
 # Create your views here.
@@ -50,3 +50,17 @@ def todo_detail(request, id):
         todo.delete()
         # return JsonResponse({"msg": "삭제되었습니다."})
         return HttpResponse(status=204)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+@authentication_classes((JSONWebTokenAuthentication,))
+def user_detail(request, id):
+    user = get_object_or_404(User, id=id)
+
+    # 내가 작성한 todo에 대한 정보만 확인할 수 있도록 설정
+    if request.user != user:
+        return  HttpResponse(status=403)
+
+    if request.method == "GET":
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data)
